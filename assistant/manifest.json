@@ -1,7 +1,7 @@
 {
-  "name": "JARVIS — AI Personal Assistant",
-  "short_name": "JARVIS",
-  "description": "Your personal AI assistant powered by Claude. Works on iPhone, iPad, and MacBook.",
+  "name": "BORON — AI Personal Assistant",
+  "short_name": "BORON",
+  "description": "BORON — your personal AI assistant powered by Claude. Works on iPhone, iPad, and MacBook.",
   "start_url": "/assistant/",
   "scope": "/assistant/",
   "display": "standalone",

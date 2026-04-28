@@ -7,15 +7,15 @@
   <!-- iOS PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="JARVIS">
+  <meta name="apple-mobile-web-app-title" content="BORON">
   <link rel="apple-touch-icon" href="icons/icon.svg">
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000814">
-  <meta name="description" content="Your personal AI assistant — powered by Claude. Works on iPhone, iPad, and MacBook.">
+  <meta name="description" content="BORON — your personal AI assistant powered by Claude. Works on iPhone, iPad, and MacBook.">
 
-  <title>J.A.R.V.I.S. — AI Assistant</title>
+  <title>B.O.R.O.N. — AI Assistant</title>
   <link rel="stylesheet" href="css/jarvis.css">
 </head>
 <body>
@@ -25,10 +25,11 @@
   <header id="header">
     <div class="header-left">
       <div class="status-orb" id="status-orb"></div>
-      <span class="brand">J.A.R.V.I.S.</span>
+      <span class="brand">B.O.R.O.N.</span>
     </div>
     <div class="header-right">
       <span id="status-text">Ready</span>
+      <button class="icon-btn wake-btn" id="wake-btn" aria-label="Toggle Hey Boron wake word" title="Hey Boron">👂</button>
       <button class="icon-btn" id="settings-btn" aria-label="Settings">⚙</button>
     </div>
   </header>
@@ -132,7 +133,7 @@
     </button>
 
     <input type="text" id="text-input"
-           placeholder="Ask JARVIS anything…"
+           placeholder="Ask BORON anything…"
            autocomplete="off"
            autocorrect="off"
            autocapitalize="sentences"

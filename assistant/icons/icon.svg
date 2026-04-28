@@ -17,9 +17,9 @@
   <text x="256" y="310" text-anchor="middle"
         font-family="-apple-system, SF Pro Display, Helvetica Neue, sans-serif"
         font-size="210" font-weight="900"
-        fill="#00b4d8" filter="url(#glow)">J</text>
+        fill="#00b4d8" filter="url(#glow)">B</text>
   <text x="256" y="395" text-anchor="middle"
         font-family="-apple-system, SF Pro Text, Helvetica, sans-serif"
         font-size="28" font-weight="500" letter-spacing="12"
-        fill="#90e0ef" opacity="0.8">ARVIS</text>
+        fill="#90e0ef" opacity="0.8">ORON</text>
 </svg>

@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'jarvis-v1';
+const CACHE = 'boron-v1';
 const SHELL = [
   '/assistant/',
   '/assistant/index.html',

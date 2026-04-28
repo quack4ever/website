@@ -599,6 +599,41 @@ body::after {
   to   { opacity: 1; }
 }
 
+/* ── Wake word button ── */
+.wake-btn.active {
+  border-color: var(--success);
+  color: var(--success);
+  box-shadow: 0 0 10px rgba(6, 214, 160, 0.4);
+  animation: wakeGlow 2s ease-in-out infinite;
+}
+@keyframes wakeGlow {
+  0%,100% { box-shadow: 0 0 8px  rgba(6,214,160,0.35); }
+  50%      { box-shadow: 0 0 18px rgba(6,214,160,0.7);  }
+}
+
+/* Wake word "standby" badge shown at top of chat */
+#wake-badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  align-self: center;
+  background: rgba(6, 214, 160, 0.1);
+  border: 1px solid rgba(6, 214, 160, 0.35);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 11px;
+  color: var(--success);
+  letter-spacing: 1px;
+  animation: fadeIn 0.3s ease-out;
+}
+#wake-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulseOrb 1.8s ease-in-out infinite;
+}
+
 /* ── Responsive: tablet / Mac ── */
 @media (min-width: 680px) {
   #app {
