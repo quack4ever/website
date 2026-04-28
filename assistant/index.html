@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <!-- iOS PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JARVIS">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000814">
+  <meta name="description" content="Your personal AI assistant — powered by Claude. Works on iPhone, iPad, and MacBook.">
+
+  <title>J.A.R.V.I.S. — AI Assistant</title>
+  <link rel="stylesheet" href="css/jarvis.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Header ── -->
+  <header id="header">
+    <div class="header-left">
+      <div class="status-orb" id="status-orb"></div>
+      <span class="brand">J.A.R.V.I.S.</span>
+    </div>
+    <div class="header-right">
+      <span id="status-text">Ready</span>
+      <button class="icon-btn" id="settings-btn" aria-label="Settings">⚙</button>
+    </div>
+  </header>
+
+  <!-- ── Chat ── -->
+  <main id="chat-area" role="log" aria-live="polite" aria-label="Conversation">
+    <div id="messages"></div>
+  </main>
+
+  <!-- ── Quick App Launcher ── -->
+  <section id="quick-apps" aria-label="Quick app launcher">
+    <div class="apps-scroll">
+
+      <button class="app-btn" data-app="maps">
+        <span class="app-icon">🗺️</span>
+        <span class="app-label">Maps</span>
+      </button>
+
+      <button class="app-btn" data-app="phone">
+        <span class="app-icon">📞</span>
+        <span class="app-label">Phone</span>
+      </button>
+
+      <button class="app-btn" data-app="messages">
+        <span class="app-icon">💬</span>
+        <span class="app-label">Messages</span>
+      </button>
+
+      <button class="app-btn" data-app="facetime">
+        <span class="app-icon">📹</span>
+        <span class="app-label">FaceTime</span>
+      </button>
+
+      <button class="app-btn" data-app="mail">
+        <span class="app-icon">✉️</span>
+        <span class="app-label">Mail</span>
+      </button>
+
+      <button class="app-btn" data-app="calendar">
+        <span class="app-icon">📅</span>
+        <span class="app-label">Calendar</span>
+      </button>
+
+      <button class="app-btn" data-app="reminders">
+        <span class="app-icon">🔔</span>
+        <span class="app-label">Reminders</span>
+      </button>
+
+      <button class="app-btn" data-app="notes">
+        <span class="app-icon">📝</span>
+        <span class="app-label">Notes</span>
+      </button>
+
+      <button class="app-btn" data-app="music">
+        <span class="app-icon">🎵</span>
+        <span class="app-label">Music</span>
+      </button>
+
+      <button class="app-btn" data-app="camera">
+        <span class="app-icon">📷</span>
+        <span class="app-label">Camera</span>
+      </button>
+
+      <button class="app-btn" data-app="weather">
+        <span class="app-icon">🌤️</span>
+        <span class="app-label">Weather</span>
+      </button>
+
+      <button class="app-btn" data-app="youtube">
+        <span class="app-icon">▶️</span>
+        <span class="app-label">YouTube</span>
+      </button>
+
+      <button class="app-btn" data-app="spotify">
+        <span class="app-icon">🎧</span>
+        <span class="app-label">Spotify</span>
+      </button>
+
+      <button class="app-btn" data-app="instagram">
+        <span class="app-icon">📸</span>
+        <span class="app-label">Instagram</span>
+      </button>
+
+      <button class="app-btn" data-app="settings">
+        <span class="app-icon">⚙️</span>
+        <span class="app-label">Settings</span>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- ── Input bar ── -->
+  <footer id="input-area">
+    <button class="voice-btn" id="voice-btn" aria-label="Voice input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="22"/>
+        <line x1="8"  y1="22" x2="16" y2="22"/>
+      </svg>
+    </button>
+
+    <input type="text" id="text-input"
+           placeholder="Ask JARVIS anything…"
+           autocomplete="off"
+           autocorrect="off"
+           autocapitalize="sentences"
+           spellcheck="true"
+           enterkeyhint="send"
+           aria-label="Message input">
+
+    <button class="send-btn" id="send-btn" aria-label="Send">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </footer>
+
+</div><!-- #app -->
+
+<!-- ── Settings modal ── -->
+<div id="settings-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Settings">
+  <div class="modal-content">
+    <div class="modal-handle"></div>
+    <h2>Configuration</h2>
+    <p class="modal-desc">
+      Your API key is stored only on this device — it is never sent anywhere except directly to Anthropic's servers.
+      Get a key at <strong>console.anthropic.com</strong>.
+    </p>
+
+    <label>
+      Anthropic API Key
+      <input type="password" id="api-key-input" placeholder="sk-ant-api03-…" autocomplete="off">
+    </label>
+
+    <label>
+      Your Name
+      <input type="text" id="user-name-input" placeholder="e.g. Tony" autocomplete="given-name">
+    </label>
+
+    <label>
+      Assistant Voice
+      <select id="voice-select">
+        <option value="">System Default</option>
+      </select>
+    </label>
+
+    <div class="modal-actions">
+      <button id="save-settings-btn"  class="primary-btn">Save</button>
+      <button id="close-settings-btn" class="ghost-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Listening overlay ── -->
+<div id="listening-overlay" class="hidden" role="status" aria-live="assertive">
+  <div class="listening-content">
+    <div class="voice-orb">
+      <div class="ring ring-1"></div>
+      <div class="ring ring-2"></div>
+      <div class="ring ring-3"></div>
+      <div class="core"></div>
+    </div>
+    <p id="interim-text">Listening…</p>
+    <button id="stop-listening-btn">Stop</button>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
