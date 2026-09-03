@@ -41,6 +41,21 @@ DEFAULT_MODEL = "claude-opus-5"
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
 
 
+def _venv_python() -> str:
+    """The interpreter this installation actually runs on.
+
+    We report the real path rather than a hardcoded one so the instruction
+    works on any machine and any install location.
+    """
+    import sys
+    from pathlib import Path
+    from .. import paths
+    candidate = paths.home() / "venv" / "bin" / "python"
+    if candidate.exists():
+        return str(candidate)
+    return sys.executable or "python3"
+
+
 class AnthropicProvider(AIProvider):
     name = "anthropic"
     is_local = False
@@ -93,10 +108,16 @@ class AnthropicProvider(AIProvider):
             return Availability(
                 False,
                 reason="The 'anthropic' Python package is not installed.",
-                fix="Run:  assistant doctor --fix   (or install it yourself "
-                    "into the assistant's environment with "
-                    "'~/Library/Application Support/PersonalAIOS/venv/bin/pip "
-                    "install anthropic')",
+                # Give the REAL path for THIS installation, not a guess. A fix
+                # instruction that names a file the user does not have is worse
+                # than no instruction at all.
+                fix="Install it into the assistant's own environment:\n"
+                    "  %s -m pip install anthropic\n"
+                    "Then run 'assistant doctor' to confirm.\n"
+                    "Prefer to stay offline? Install Ollama "
+                    "(https://ollama.com) and run:\n"
+                    "  assistant config set ai.roles.reasoning ollama"
+                    % _venv_python(),
             )
         if not self._has_credentials():
             return Availability(
