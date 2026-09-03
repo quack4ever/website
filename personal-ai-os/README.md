@@ -8,8 +8,20 @@ service plus a command you type, wired into macOS through Apple's own supported
 interfaces, with a permission system standing between the AI and your computer.
 
 ```
-$ assistant ask "what am I missing on my science project?"
-$ assistant plan "help me organise my whole semester"
+$ assistant                       # just talk to it - no quotes, no command names
+you › what am I missing on my science project?
+```
+
+Or use the **desktop app** — menu bar icon, click-to-approve, folder picker:
+
+```
+$ cd mac-app && ./build.sh --install --run
+```
+
+Everything is also available as one-shot commands:
+
+```
+$ assistant ask "help me organise my semester"
 $ assistant permissions grant ~/Documents
 $ assistant stop          # emergency brake, works instantly
 ```
@@ -223,6 +235,7 @@ per-step confidence from 0.95 to 0.63 and the planner **changed its mind**.
 | **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** | When something does not work |
 | **[DEVELOPMENT.md](DEVELOPMENT.md)** | Reading and changing the code |
 | **[UNINSTALL.md](UNINSTALL.md)** | Removing it cleanly |
+| **[mac-app/README.md](mac-app/README.md)** | The desktop app |
 | **[docs/STATUS.md](docs/STATUS.md)** | What works, what does not, no marketing |
 
 ---

@@ -367,6 +367,7 @@ def _render_macos_permissions(data: Dict[str, Any]) -> str:
 # ==========================================================================
 EPILOG = """\
 examples:
+  assistant                                    just talk to it (easiest)
   assistant permissions grant ~/Documents      let it read your Documents
   assistant index build                        catalogue those files
   assistant ask "what am I missing on my science project?"
@@ -391,6 +392,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--version", action="version",
                         version="Personal AI OS %s" % __version__)
     sub = parser.add_subparsers(dest="command", metavar="<command>")
+
+    sub.add_parser("chat", help="Talk to it. No quotes, no command names. (default)")
 
     ask = sub.add_parser("ask", help="Ask a question or request something.")
     ask.add_argument("question", nargs="+")
@@ -736,11 +739,21 @@ def main(argv: Optional[List[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     if not args.command:
+        # Running `assistant` on its own should start a conversation, not print
+        # a wall of help. When output is piped somewhere (a script, a file) an
+        # interactive prompt would hang forever, so fall back to help there.
+        if sys.stdin.isatty() and sys.stdout.isatty():
+            from . import chat
+            return chat.run(lambda c, a=None: _call(c, a, args.local)) or 0
         parser.print_help()
         return 0
 
     try:
         command = args.command
+
+        if command == "chat":
+            from . import chat
+            return chat.run(lambda c, a=None: _call(c, a, args.local)) or 0
 
         if command == "ask":
             payload = {"question": " ".join(args.question), "role": args.role}

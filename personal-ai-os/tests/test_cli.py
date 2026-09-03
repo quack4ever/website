@@ -252,3 +252,78 @@ def test_empty_table_says_so():
 def test_colour_is_disabled_when_not_a_terminal(monkeypatch):
     monkeypatch.setattr(render.sys.stdout, "isatty", lambda: False, raising=False)
     assert render.paint("hello", "red") == "hello"
+
+
+# ===========================================================================
+# Interactive mode
+# ===========================================================================
+def test_chat_slash_commands_work(sandbox, capsys, monkeypatch):
+    """Drive the conversation loop with a scripted set of inputs."""
+    from assistant.cli import chat
+    from assistant.daemon import handlers
+
+    (sandbox.docs / "bio.txt").write_text("photosynthesis and chlorophyll")
+    script = iter(["/grant %s" % sandbox.docs, "/index", "/search photosynthesis",
+                   "/status", "/quit"])
+    monkeypatch.setattr("builtins.input", lambda prompt="": next(script))
+
+    code = chat.run(lambda c, a=None: handlers.dispatch(c, a or {}))
+    out = capsys.readouterr().out
+    assert code == 0
+    assert "Granted read access" in out
+    assert "Index updated" in out
+    assert "bio.txt" in out
+    assert "Bye." in out
+
+
+def test_chat_grant_rw_shorthand(sandbox, capsys, monkeypatch):
+    from assistant.cli import chat
+    from assistant.daemon import handlers
+    from assistant.security import pathguard
+
+    script = iter(["/grant %s rw" % sandbox.downloads, "/quit"])
+    monkeypatch.setattr("builtins.input", lambda prompt="": next(script))
+    chat.run(lambda c, a=None: handlers.dispatch(c, a or {}))
+    assert pathguard.list_scopes()[0].mode == "readwrite"
+
+
+def test_chat_unknown_slash_command_is_explained(sandbox, capsys, monkeypatch):
+    from assistant.cli import chat
+    from assistant.daemon import handlers
+    script = iter(["/nonsense", "/quit"])
+    monkeypatch.setattr("builtins.input", lambda prompt="": next(script))
+    chat.run(lambda c, a=None: handlers.dispatch(c, a or {}))
+    out = capsys.readouterr().out
+    assert "Unknown command /nonsense" in out
+    assert "/help" in out
+
+
+def test_chat_stop_and_resume(sandbox, capsys, monkeypatch):
+    from assistant.cli import chat
+    from assistant.daemon import handlers
+    from assistant.security import killswitch
+
+    seen = []
+
+    def fake_input(prompt=""):
+        step = len(seen)
+        seen.append(step)
+        if step == 0:
+            return "/stop"
+        if step == 1:
+            assert killswitch.is_engaged(), "stop did not engage the kill switch"
+            return "/resume"
+        return "/quit"
+
+    monkeypatch.setattr("builtins.input", fake_input)
+    chat.run(lambda c, a=None: handlers.dispatch(c, a or {}))
+    assert killswitch.is_engaged() is False
+
+
+def test_bare_assistant_prints_help_when_not_a_terminal(sandbox, capsys):
+    """Piping `assistant` into a file must not hang waiting for input."""
+    code = cli.main(["--local"])
+    out = capsys.readouterr().out
+    assert code == 0
+    assert "examples:" in out
+    assert "just talk to it" in out
