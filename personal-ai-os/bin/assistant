@@ -1,0 +1,6 @@
+#!/bin/bash
+# Run the assistant straight from a source checkout, without installing.
+# Useful for development. The installed copy lives in ~/.local/bin/assistant.
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export PYTHONPATH="$HERE/src${PYTHONPATH:+:$PYTHONPATH}"
+exec "${PAIOS_PYTHON:-python3}" -m assistant "$@"
