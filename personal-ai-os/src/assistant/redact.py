@@ -44,6 +44,13 @@ _PATTERNS: List[Tuple[str, "re.Pattern[str]"]] = [
     ("password_assignment", re.compile(
         r"(?i)\b(?:password|passwd|pwd|secret|api[_-]?key|access[_-]?token)"
         r"\s*[:=]\s*[\"']?([^\s\"',;]{6,})[\"']?")),
+    # People rarely write "password=x" in conversation.  They write
+    # "my password is x".  Without this pattern the natural phrasing sailed
+    # straight past the check and into long-term memory.
+    ("password_phrase", re.compile(
+        r"(?i)\b(?:password|passcode|passphrase|pin\s+number|"
+        r"api[ _-]?key|secret[ _-]?key|access[ _-]?token|auth[ _-]?token)\b"
+        r"\s*(?:is|was|are|:|=)\s+[\"']?([^\s\"',;]{6,})[\"']?")),
     ("credit_card", re.compile(r"\b(?:\d[ -]*?){13,19}\b")),
     ("ssn_us", re.compile(r"\b\d{3}-\d{2}-\d{4}\b")),
 ]
@@ -55,6 +62,22 @@ _SENSITIVE_KEYS = {
     "client_secret", "session_key", "credentials",
 }
 
+
+#: If one of these follows "my password is", the sentence is *about* a
+#: password rather than containing one ("my password is stored in 1Password").
+#: Without this list the checker would refuse harmless notes.
+_NON_SECRET_VALUES = frozenset({
+    "stored", "saved", "secret", "safe", "hidden", "written", "kept",
+    "changed", "expired", "wrong", "correct", "strong", "weak", "unknown",
+    "somewhere", "different", "the", "my", "our", "your", "this", "that",
+    "always", "never", "empty", "blank", "required", "needed", "reset",
+})
+
+
+def _is_real_value(text: str) -> bool:
+    """Filter out sentences that mention a password without revealing one."""
+    stripped = text.strip().strip("\"'.,;:")
+    return bool(stripped) and stripped.lower() not in _NON_SECRET_VALUES
 
 def _luhn_ok(digits: str) -> bool:
     """Credit-card checksum, so we do not black out every long number."""
@@ -83,6 +106,8 @@ def find_secrets(text: str) -> List[str]:
                 digits = re.sub(r"[^0-9]", "", match.group(0))
                 if not _luhn_ok(digits):
                     continue
+            if name == "password_phrase" and not _is_real_value(match.group(1)):
+                continue
             found.append(name)
             break
     return found
@@ -99,9 +124,11 @@ def redact_text(text: str) -> str:
                 digits = re.sub(r"[^0-9]", "", match.group(0))
                 return MASK if _luhn_ok(digits) else match.group(0)
             out = pattern.sub(_cc, out)
-        elif name == "password_assignment":
+        elif name in ("password_assignment", "password_phrase"):
             def _pw(match: "re.Match[str]") -> str:
                 whole, value = match.group(0), match.group(1)
+                if name == "password_phrase" and not _is_real_value(value):
+                    return whole
                 return whole.replace(value, MASK)
             out = pattern.sub(_pw, out)
         else:
