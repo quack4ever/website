@@ -31,7 +31,8 @@ import time
 from typing import Any, Callable, Dict, List, NamedTuple, Optional, Sequence
 
 from .. import audit, config as config_module
-from ..errors import AssistantError, ToolError, ToolNotFound
+from ..errors import (AssistantError, PermissionDenied, ToolError,
+                      ToolNotFound)
 from ..logging_setup import get
 from ..security import capabilities, consent, policy
 from . import schema as schema_module
@@ -255,7 +256,10 @@ def execute(name: str, arguments: Optional[Dict[str, Any]] = None,
         decision = ctx.engine().evaluate(request)
 
     if decision.outcome == policy.DENY:
-        error = AssistantError(
+        # PermissionDenied, not the generic base class: callers need to tell
+        # "the guard said no" apart from "the tool broke".  They are very
+        # different situations and only one of them is a bug.
+        error = PermissionDenied(
             what="Not allowed: %s" % summary,
             why=decision.reason,
             tried="Checking this action against your permissions (rule %s)"
